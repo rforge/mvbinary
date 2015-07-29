@@ -1,4 +1,3 @@
-useDynLib(MvBinary)
 export(MvBinaryEstim)
 exportClasses("MvBinaryResult")
 importFrom("mgcv", uniquecombs)
