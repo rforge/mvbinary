@@ -12,11 +12,11 @@ MvBinaryEstim <- function(x, models, nbcores=1, tol=0.01, nbinit=10){
   }
   
   # If a list of models if not specified, a model collection is given by a CAH based on the Cramer's V matrix of similarities
-  if (is.missing(models)){
+  if (missing(models)){
     tree <- hclust(as.dist(1-VcramerEmpiric), method="ward")
     models <- list(); for (k in 1:ncol(x)) models[[k]] <- cutree(tree, k)
   }
-  
+
   # Inference for the competiting models
   nb.cpus <- min(detectCores(all.tests = FALSE, logical = FALSE), nbcores)
   if ((nbcores>1)&&(Sys.info()["sysname"] != "Windows"))
