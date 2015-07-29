@@ -19,7 +19,10 @@
 ##' @keywords package
 ##' @import mgcv
 ##' @import parallel
+##' @import graphics
 ##' @export MvBinaryEstim
+##' @exportMethod plot
+##' @exportMethod boxplot
 ##' @exportClass MvBinaryResult
 ##'
 ##' @author
@@ -60,7 +63,6 @@ MvBinaryEstim <- function(x, models, nbcores=1, tol=0.01, nbinit=10){
       reference <- mclapply(X = models, FUN = AnalyseMultiBlock, x=x, tol=tol, nbinit=nbinit, mc.cores = nb.cpus, mc.preschedule = TRUE, mc.cleanup = TRUE)
   else
     reference <- list(); for (loc in 1:length(models)) reference[[loc]] <- AnalyseMultiBlock(x, models[[loc]], tol, nbinit)
-
   
   # Design outputs
   allBIC <- rep(NA, length(reference))
@@ -75,7 +77,7 @@ MvBinaryEstim <- function(x, models, nbcores=1, tol=0.01, nbinit=10){
   
   CramerModel <- matrix(0, ncol(x), ncol(x))
   for (j in 1:ncol(x)){
-    inf <- Bestparam[,1]<Bestparam[j,1]
+    inf <- (Bestparam[,1]<Bestparam[j,1])
     alpha1 <- Bestparam[,1]*inf + Bestparam[j,1]*(1-inf)
     alpha2 <- Bestparam[,1]*(1-inf) + Bestparam[j,1]*(inf)
     if (any(Bestparam[,4]==Bestparam[j,4])){

@@ -2,5 +2,8 @@
 
 export(MvBinaryEstim)
 exportClasses(MvBinaryResult)
+exportMethods(boxplot)
+exportMethods(plot)
+import(graphics)
 import(mgcv)
 import(parallel)
