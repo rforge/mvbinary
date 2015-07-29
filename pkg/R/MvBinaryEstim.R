@@ -34,7 +34,7 @@
 ##' rm(list=ls())
 ##' require(MvBinary)
 ##' data(MvBinaryExample)
-##' test <- MvBinaryEstim(MvBinaryExample, nbcores = 3)
+##' test <- MvBinaryEstim(MvBinaryExample)
 ##'
 NULL
 
