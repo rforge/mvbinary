@@ -1,0 +1,5 @@
+useDynLib(MvBinary)
+export(MvBinaryEstim)
+exportClasses("MvBinaryResult")
+importFrom("mgcv", uniquecombs)
+importFrom("parallel", mclapply, detectCores, makeCluster, clusterExport, parLapply, clusterEvalQ, stopCluster)
