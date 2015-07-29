@@ -1,3 +1,40 @@
+##' MvBinary a package for Multivariate Binary data
+##'
+##' MvBinary is a tool for fitting distribution on correlated multivariate binary data.
+##'
+##' \tabular{ll}{
+##'   Package: \tab MvBinary\cr 
+##'   Type: \tab Package\cr 
+##'   Version: \tab 1.0.0\cr
+##'   Date: \tab 2015-07-29\cr 
+##'   License: \tab GPL-2\cr 
+##'   LazyLoad: \tab yes\cr
+##' }
+##'
+##'
+##' @name MvBinary-package
+##' @aliases MvBinary
+##' @rdname MvBinary-package
+##' @docType package
+##' @keywords package
+##' @import mgcv
+##' @import parallel
+##' @export MvBinaryEstim
+##' @exportClass MvBinaryResult
+##'
+##' @author
+##' Author: Marbac M., and Sedki S.
+##'
+##' @references Todo.
+##'
+##' @examples
+##' rm(list=ls())
+##' require(MvBinary)
+##' data(MvBinaryExample)
+##' test <- MvBinaryEstim(MvBinaryExample, nbcores = 3)
+##'
+NULL
+
 MvBinaryEstim <- function(x, models, nbcores=1, tol=0.01, nbinit=10){
   if (is.null(colnames(x))) colnames(x) <- paste("x",1:ncol(x), sep="")
   
