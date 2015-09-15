@@ -61,7 +61,7 @@ OneXemBlock <- function(x, weight, alpha, tol){
     loglikeprec <- loglikeactu
     loglikeactu <- sum(log(probaInd)*weight)
   }
-  if (loglikeprec>loglikeactu) warning("Error in the EM block algorithm")
+#  if (loglikeprec>loglikeactu) warning("Error in the EM block algorithm")
   if (delta[1]==0) delta <-  1- delta
   return(list(epsilon=epsilon, delta=delta, loglike=loglikeactu))
 }

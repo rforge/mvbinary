@@ -21,6 +21,7 @@
 ##' @import parallel
 ##' @import graphics
 ##' @export MvBinaryEstimCAH
+##' @export MvBinaryEstimMH
 ##' @exportClass MvBinaryResult
 ##'
 ##' @author
@@ -32,11 +33,12 @@
 ##' rm(list=ls())
 ##' require(MvBinary)
 ##' data(MvBinaryExample)
-##' test <- MvBinaryEstimCAH(MvBinaryExample)
+##' res.CAH <- MvBinaryEstimCAH(MvBinaryExample, 4)
+##' res.MH <- MvBinaryEstimMH(MvBinaryExample, 4, iterMH = 20, nbchains = 8)
 ##'
 NULL
 
-MvBinaryEstimCAH <- function(x, nbcores=1, tol=0.01, nbiter=10){
+MvBinaryEstimCAH <- function(x, nbcores=1, tol=0.01, nbiter=20){
   if (is.null(colnames(x))) colnames(x) <- paste("x",1:ncol(x), sep="")
   # Computation of the Cramer's V 
   VcramerEmpiric <- matrix(0, ncol(x), ncol(x))
@@ -52,7 +54,7 @@ MvBinaryEstimCAH <- function(x, nbcores=1, tol=0.01, nbiter=10){
   # Inference for the competiting models
   nb.cpus <- min(detectCores(all.tests = FALSE, logical = FALSE), nbcores)
   if ((nbcores>1)&&(Sys.info()["sysname"] != "Windows")){
-      reference <- mclapply(X = models, FUN = XEMmodel, dataset=x, alpha=alpha, tol=tol, nbiter=nbiter, mc.cores = nb.cpus, mc.preschedule = TRUE, mc.cleanup = TRUE)
+    reference <- mclapply(X = models, FUN = XEMmodel, dataset=x, alpha=alpha, tol=tol, nbiter=nbiter, mc.cores = nb.cpus, mc.preschedule = TRUE, mc.cleanup = TRUE)
   }else{
     reference <- list(); for (loc in 1:length(models)) reference[[loc]] <- XEMmodel(x, alpha, tol, nbiter, models[[loc]])
   }
@@ -73,5 +75,34 @@ MvBinaryEstimCAH <- function(x, nbcores=1, tol=0.01, nbiter=10){
               nbparam=reference[[which.max(allBIC)]]$nbparam,
               loglike=reference[[which.max(allBIC)]]$loglike,
               bic=reference[[which.max(allBIC)]]$bic)
+  )
+}
+
+
+
+MvBinaryEstimMH <- function(x, nbcores=1, tol=0.01, nbiter=20, iterMH=50, nbchains=10){
+  if (is.null(colnames(x))) colnames(x) <- paste("x",1:ncol(x), sep="")
+  # Computation of the Cramer's V 
+  alpha <- colMeans(x)
+  # Inference for the competiting models
+  nb.cpus <- min(detectCores(all.tests = FALSE, logical = FALSE), nbcores, nbchains)
+  if ((nbcores>1)&&(Sys.info()["sysname"] != "Windows")){
+    reference <- mclapply(X = as.list(rep(iterMH,nbchains)), FUN = OneMH, x=x, alpha=alpha, tol=tol, nbiter=nbiter, mc.cores = nb.cpus, mc.preschedule = TRUE, mc.cleanup = TRUE)
+  }else{
+    reference <- list(); for (loc in 1:nbchains) reference[[loc]] <- OneMH(x, alpha, tol, nbiter, iterMH)
+  }
+  # Design outputs
+  allBIC <- rep(NA, length(reference))
+  for (loc in 1:length(reference))    allBIC[loc] <- reference[[loc]]$bic
+  Best <- XEMmodel(x, alpha, tol, nbiter, reference[[which.max(allBIC)]]$blocks)
+  names(Best$epsilon) <-  names(Best$delta) <- colnames(x)
+  return( new("MvBinaryResult", 
+              alpha=alpha, 
+              epsilon=Best$epsilon, 
+              delta=Best$delta, 
+              blocks=Best$model,
+              nbparam=Best$nbparam,
+              loglike=Best$loglike,
+              bic=Best$bic)
   )
 }
