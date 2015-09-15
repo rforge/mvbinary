@@ -22,7 +22,7 @@ MvBinary is a tool for fitting distribution on correlated multivariate binary da
 rm(list=ls())
 require(MvBinary)
 data(MvBinaryExample)
-test <- MvBinaryEstim(MvBinaryExample)
+test <- MvBinaryEstimCAH(MvBinaryExample)
 }
 \author{
 Author: Marbac M., and Sedki S.

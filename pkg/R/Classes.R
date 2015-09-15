@@ -1,19 +1,21 @@
 setClass(
   Class = "MvBinaryResult", 
   representation = representation(
-    allModels="matrix",
-    allBIC="numeric",
-    dependencies="data.frame",
-    bestparam="matrix",
-    bestinfo="list",
-    error="logical"
+    alpha="numeric",
+    epsilon="numeric",
+    delta="numeric",
+    blocks="numeric",
+    nbparam="numeric",
+    loglike="numeric",
+    bic="numeric"
   ), 
   prototype = prototype(
-    allModels=matrix(),
-    allBIC=numeric(),
-    dependencies=data.frame(),
-    bestparam=matrix(),
-    bestinfo=list(),
-    error=logical()
+    alpha=numeric(),
+    epsilon=numeric(),
+    delta=numeric(),
+    blocks=numeric(),
+    nbparam=numeric(),
+    loglike=numeric(),
+    bic=numeric()
   )
 )
