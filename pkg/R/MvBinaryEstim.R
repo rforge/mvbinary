@@ -20,6 +20,7 @@
 ##' @import mgcv
 ##' @import parallel
 ##' @import graphics
+##' @import methods
 ##' @export MvBinaryEstimCAH
 ##' @export MvBinaryEstimMH
 ##' @exportClass MvBinaryResult
