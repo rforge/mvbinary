@@ -23,6 +23,7 @@
 ##' @import methods
 ##' @export MvBinaryEstimCAH
 ##' @export MvBinaryEstimMH
+##' @export MvBinaryProbaPost
 ##' @exportClass MvBinaryResult
 ##'
 ##' @author

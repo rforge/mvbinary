@@ -2,6 +2,7 @@
 
 export(MvBinaryEstimCAH)
 export(MvBinaryEstimMH)
+export(MvBinaryProbaPost)
 exportClasses(MvBinaryResult)
 import(graphics)
 import(methods)
