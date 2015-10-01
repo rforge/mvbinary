@@ -40,19 +40,31 @@
 ##'
 NULL
 
-MvBinaryEstimCAH <- function(x, nbcores=1, tol=0.01, nbiter=20){
+MvBinaryEstimCAH <- function(x, nbcores=1, tol=0.01, nbiter=40, modelslist=NULL){
   if (is.null(colnames(x))) colnames(x) <- paste("x",1:ncol(x), sep="")
-  # Computation of the Cramer's V 
-  VcramerEmpiric <- matrix(0, ncol(x), ncol(x))
-  rownames(VcramerEmpiric) <- colnames(VcramerEmpiric) <- colnames(x)
   alpha <- colMeans(x)
-  for (j in 1:ncol(x)){
-    obs <- rbind((t(x[,j])%*%(x)), (t(x[,j])%*%(1-x)), (t(1-x[,j])%*%(x)), (t(1-x[,j])%*%(1-x)))/nrow(x)
-    th <- rbind(alpha[j]*alpha, alpha[j] * (1-alpha), (1-alpha[j])*alpha, (1-alpha[j])*(1-alpha))
-    VcramerEmpiric[j,] <- sqrt(colSums((obs - th)**2 / th))
+  if (is.null(modelslist)){
+    # Computation of the Cramer's V 
+    VcramerEmpiric <- matrix(0, ncol(x), ncol(x))
+    rownames(VcramerEmpiric) <- colnames(VcramerEmpiric) <- colnames(x)
+    for (j in 1:ncol(x)){
+      obs <- rbind((t(x[,j])%*%(x)), (t(x[,j])%*%(1-x)), (t(1-x[,j])%*%(x)), (t(1-x[,j])%*%(1-x)))/nrow(x)
+      th <- rbind(alpha[j]*alpha, alpha[j] * (1-alpha), (1-alpha[j])*alpha, (1-alpha[j])*(1-alpha))
+      VcramerEmpiric[j,] <- sqrt(colSums((obs - th)**2 / th))
+    }
+    tree <- hclust(as.dist(1-VcramerEmpiric), method="ward")
+    models <- list(); for (k in 1:ncol(x)) models[[k]] <- cutree(tree, k)
+  }else{
+    if (is.list(modelslist)){
+      for (j in 1:length(modelslist)){
+        if (length(modelslist[[j]])!=ncol(x))   stop("models list should be a list where each element gives the partition of the variables by a vector of size d")
+      }
+      models <- modelslist
+    }else{
+      stop("models list should be a list")
+    }
   }
-  tree <- hclust(as.dist(1-VcramerEmpiric), method="ward")
-  models <- list(); for (k in 1:ncol(x)) models[[k]] <- cutree(tree, k)
+  
   # Inference for the competiting models
   nb.cpus <- min(detectCores(all.tests = FALSE, logical = FALSE), nbcores)
   if ((nbcores>1)&&(Sys.info()["sysname"] != "Windows")){
