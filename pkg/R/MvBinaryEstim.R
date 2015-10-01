@@ -24,6 +24,8 @@
 ##' @export MvBinaryEstimCAH
 ##' @export MvBinaryEstimMH
 ##' @export MvBinaryProbaPost
+##' @export ComputeEmpiricCramer
+##' @export ComputeMvBinaryCramer
 ##' @exportClass MvBinaryResult
 ##'
 ##' @author
@@ -45,13 +47,7 @@ MvBinaryEstimCAH <- function(x, nbcores=1, tol=0.01, nbiter=40, modelslist=NULL)
   alpha <- colMeans(x)
   if (is.null(modelslist)){
     # Computation of the Cramer's V 
-    VcramerEmpiric <- matrix(0, ncol(x), ncol(x))
-    rownames(VcramerEmpiric) <- colnames(VcramerEmpiric) <- colnames(x)
-    for (j in 1:ncol(x)){
-      obs <- rbind((t(x[,j])%*%(x)), (t(x[,j])%*%(1-x)), (t(1-x[,j])%*%(x)), (t(1-x[,j])%*%(1-x)))/nrow(x)
-      th <- rbind(alpha[j]*alpha, alpha[j] * (1-alpha), (1-alpha[j])*alpha, (1-alpha[j])*(1-alpha))
-      VcramerEmpiric[j,] <- sqrt(colSums((obs - th)**2 / th))
-    }
+    VcramerEmpiric <- ComputeEmpiricCramer(x)
     tree <- hclust(as.dist(1-VcramerEmpiric), method="ward")
     models <- list(); for (k in 1:ncol(x)) models[[k]] <- cutree(tree, k)
   }else{
