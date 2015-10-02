@@ -1,4 +1,15 @@
+#' Computation of the Empiric Cramer'v.
+#' 
+#' This function computes the Empiric Cramer's V for a binary data set.
+#' @param x a binary matrix.
+#' @return Return the matrix of the Empiric Cramer's V.
+#' 
+#' @export
+#' 
 ComputeEmpiricCramer <- function(x){
+  if ( (is.matrix(x)==FALSE) || any((x==0) + (x==1) == 0) )
+    stop("The input parameter x must be a binary matrix")
+  
   alpha <- colMeans(x)
   VcramerEmpiric <- matrix(0, ncol(x), ncol(x))
   rownames(VcramerEmpiric) <- colnames(VcramerEmpiric) <- colnames(x)
@@ -10,8 +21,17 @@ ComputeEmpiricCramer <- function(x){
   return(VcramerEmpiric)
 }
 
-
+#' Computation of the model Cramer'v.
+#' 
+#' This function computes the model Cramer's V for a binary data set.
+#' @param results an instance of S4 class MvBinaryResult (provided by the function MvBinaryEstim)
+#' @return Return the matrix of the Empiric Cramer's V.
+#' 
+#' @export
+#' 
 ComputeMvBinaryCramer <- function(results){
+  if (class(results)!= "MvBinaryResult")
+    stop("The imput parameter must be an instance of S4 class MvBinaryResult (provided by the function MvBinaryEstim) ")
   Vcramer <- matrix(0, length(results@blocks), length(results@blocks))
   diag(Vcramer) <- 1
   rownames(Vcramer) <- colnames(Vcramer) <- names(results@blocks)

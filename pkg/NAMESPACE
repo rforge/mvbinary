@@ -2,10 +2,11 @@
 
 export(ComputeEmpiricCramer)
 export(ComputeMvBinaryCramer)
-export(MvBinaryEstimCAH)
-export(MvBinaryEstimMH)
+export(MvBinaryEstim)
 export(MvBinaryProbaPost)
 exportClasses(MvBinaryResult)
+exportMethods(print)
+exportMethods(summary)
 import(graphics)
 import(methods)
 import(mgcv)

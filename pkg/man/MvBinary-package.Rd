@@ -19,11 +19,21 @@ MvBinary is a tool for fitting distribution on correlated multivariate binary da
 }
 }
 \examples{
+# Package loading
 rm(list=ls())
 require(MvBinary)
+
+# Data loading
 data(MvBinaryExample)
-res.CAH <- MvBinaryEstimCAH(MvBinaryExample, 4)
-res.MH <- MvBinaryEstimMH(MvBinaryExample, 4, iterMH = 20, nbchains = 8)
+
+# Parameter estimation by the HAC-based algorithm on 2 cores where the EM algorithms are initialized 10 times
+res.CAH <- MvBinaryEstim(MvBinaryExample, 2, nbinit.EM = 10)
+
+# Summary of the estimated model
+summary(res.CAH)
+
+# Print the parameters of the estimated model
+print(res.CAH)
 }
 \author{
 Author: Marbac M., and Sedki S.

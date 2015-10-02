@@ -1,20 +1,20 @@
-EvalOneBlock <- function(da, alpha, tol, nbiter){
+EvalOneBlock <- function(da, alpha, tol, nbinit){
   if (length(alpha)>1){
     tmp <- uniquecombs(da)
     weight <- as.numeric(table(attr(tmp,"index")))
-    bic <- XEMblock(as.matrix(tmp), weight, alpha, tol, nbiter)$loglike - length(alpha) * log(sum(weight))
+    bic <- XEMblock(as.matrix(tmp), weight, alpha, tol, nbinit)$loglike - length(alpha) * log(sum(weight))
   }else{
     bic <- log(alpha)*sum(da) + log(1-alpha)*sum(1-da) - 0.5*log(sum(da) + sum(1-da))
   }
   return(bic)
 }
 
-OneMH <- function(x, alpha, tol, nbiter, iterMH){
+OneMH <- function(x, alpha, tol, nbinit, iterMH){
   # initalisation
   d <- ncol(x)
   omega_best <- omega_cand <- omega_current <- sample(1:d,d,replace=TRUE)
   values_best <-  rep(0, d)
-  for (b in unique(omega_best))  values_best[b] <- EvalOneBlock(x[,which(omega_best==b)], alpha[which(omega_best==b)], tol, nbiter)
+  for (b in unique(omega_best))  values_best[b] <- EvalOneBlock(x[,which(omega_best==b)], alpha[which(omega_best==b)], tol, nbinit)
   values_cand <- values_current <- values_best
   
   iter <- 0
@@ -33,11 +33,11 @@ OneMH <- function(x, alpha, tol, nbiter, iterMH){
     omega_cand[jmove] <- blockarrive
     values_cand <- values_current
     if (any(omega_cand==blockdepart)){
-      values_cand[blockdepart] <- EvalOneBlock(x[,which(omega_cand==blockdepart)], alpha[which(omega_cand==blockdepart)], tol, nbiter)
+      values_cand[blockdepart] <- EvalOneBlock(x[,which(omega_cand==blockdepart)], alpha[which(omega_cand==blockdepart)], tol, nbinit)
     }else{
       values_cand[blockdepart] <- 0
     }    
-    values_cand[blockarrive] <- EvalOneBlock(x[,which(omega_cand==blockarrive)], alpha[which(omega_cand==blockarrive)], tol, nbiter)
+    values_cand[blockarrive] <- EvalOneBlock(x[,which(omega_cand==blockarrive)], alpha[which(omega_cand==blockarrive)], tol, nbinit)
     rho <- exp(sum(values_cand[blockarrive] + values_cand[blockdepart] - values_current[blockarrive] - values_current[blockdepart]))  
     if( runif(1)<rho){
       values_current <- values_cand

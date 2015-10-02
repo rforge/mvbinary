@@ -56,7 +56,9 @@ data("plants")
 **Model selection and parameter inference**
 ```{r, comment=""}
   # Model selection and Parameter estimation (10 minutes) on 4 CPU cores
-  results <- MvBinaryEstimCAH(plants, nbcores = 4)
+  results <- MvBinaryEstim(plants, nbcores = 4)
+  # Summary of the resulting model
+  summary(results)
 ```
 
 **Relevance of the modelled dependencies**
@@ -115,14 +117,20 @@ colo[c(2,5)] <- colo[c(5,2)]
 palette(colo)
 for (k in 1:max(results@blocks)){
   theseJurisdictions <- names(results@blocks)[which(results@blocks==k)]
-  if (any(can1Pr$NAME_1 %in% theseJurisdictions))  plot(can1Pr[can1Pr$NAME_1 %in% theseJurisdictions, ], border="white", col=k, add=TRUE)
-  if (any(us1Pr$NAME_1 %in% theseJurisdictions))   plot(us1Pr[us1Pr$NAME_1 %in% theseJurisdictions, ], border="white", col=k, add=TRUE)
+  if (any(can1Pr$NAME_1 %in% theseJurisdictions))
+    plot(can1Pr[can1Pr$NAME_1 %in% theseJurisdictions, ], border="white", col=k, add=TRUE)
+  if (any(us1Pr$NAME_1 %in% theseJurisdictions))   
+    plot(us1Pr[us1Pr$NAME_1 %in% theseJurisdictions, ], border="white", col=k, add=TRUE)
 }
 legend("bottomleft", legend=paste("Block", 1:max(results@blocks)), col=colo, lty=0, pch=15)
-plot(can1Pr[can1Pr$NAME_1 %in% can1Pr$NAME_1[5], ], border="white", col=results@blocks[which(names(results@blocks)=="Labrador")], add=TRUE)
-plot(spTransform(getData('GADM', country="GRL", level=1), newProj), border="white", col=results@blocks[which(names(results@blocks)=="Greenland")], add=TRUE)
-plot(spTransform(getData('GADM', country="VIR", level=1), newProj), border="white", col=results@blocks[which(names(results@blocks)=="VirginIslands")], add=TRUE)
-plot(spTransform(getData('GADM', country="SPM", level=1), newProj), border="white", col=results@blocks[which(names(results@blocks)=="StPierreandMiquelon")], add=TRUE)
+plot(can1Pr[can1Pr$NAME_1 %in% can1Pr$NAME_1[5], ], border="white",
+     col=results@blocks[which(names(results@blocks)=="Labrador")], add=TRUE)
+plot(spTransform(getData('GADM', country="GRL", level=1), newProj), border="white",
+     col=results@blocks[which(names(results@blocks)=="Greenland")], add=TRUE)
+plot(spTransform(getData('GADM', country="VIR", level=1), newProj), border="white",
+     col=results@blocks[which(names(results@blocks)=="VirginIslands")], add=TRUE)
+plot(spTransform(getData('GADM', country="SPM", level=1), newProj), border="white", 
+     col=results@blocks[which(names(results@blocks)=="StPierreandMiquelon")], add=TRUE)
 ```
 
 **Model interpretation**
@@ -145,5 +153,6 @@ for (b in 1:max(results@blocks)){
 }
 legend("topright", legend=paste("Block", 1:max(results@blocks)), col=colo, lty=0, pch=10+1:max(results@blocks))  
 ```
+
 * <a href="#top">Go to the top</a>
 

@@ -75,7 +75,7 @@ XEMblock <- function(x, weight, alpha, tol, nbiter){
 }
 
 
-XEMmodel <- function(dataset, alpha, tol, nbiter, model){
+XEMmodel <- function(dataset, alpha, tol, nbinit.EM, model){
   delta <- epsilon <- rep(0, ncol(dataset))
   loglike <- 0
   nbparam <- length(alpha)
@@ -83,7 +83,7 @@ XEMmodel <- function(dataset, alpha, tol, nbiter, model){
     if (sum(model==b)>1){
       tmp <- uniquecombs(dataset[,which(model==b)])
       weight <- as.numeric(table(attr(tmp,"index")))
-      tmp <- XEMblock(as.matrix(tmp), weight, alpha[which(model==b)], tol, nbiter)
+      tmp <- XEMblock(as.matrix(tmp), weight, alpha[which(model==b)], tol, nbinit.EM)
       delta[which(model==b)] <- tmp$delta
       epsilon[which(model==b)] <- tmp$epsilon
       loglike <- loglike + tmp$loglike
