@@ -13,7 +13,7 @@ MvBinary is a tool for fitting distribution on correlated multivariate binary da
   Package: \tab MvBinary\cr
   Type: \tab Package\cr
   Version: \tab 1.0.0\cr
-  Date: \tab 2015-07-29\cr
+  Date: \tab 2015-11-03\cr
   License: \tab GPL-2\cr
   LazyLoad: \tab yes\cr
 }
