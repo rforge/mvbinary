@@ -1,6 +1,6 @@
 ##' MvBinary a package for Multivariate Binary data
 ##'
-##' MvBinary is a tool for fitting distribution on correlated multivariate binary data.
+##' MvBinary is a tool for fitting the distribution of correlated multivariate binary data.
 ##'
 ##' \tabular{ll}{
 ##'   Package: \tab MvBinary\cr 

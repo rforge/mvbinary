@@ -6,7 +6,7 @@
 \alias{MvBinary-package}
 \title{MvBinary a package for Multivariate Binary data}
 \description{
-MvBinary is a tool for fitting distribution on correlated multivariate binary data.
+MvBinary is a tool for fitting the distribution of correlated multivariate binary data.
 }
 \details{
 \tabular{ll}{
