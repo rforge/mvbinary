@@ -39,7 +39,7 @@ print(res.CAH)
 Author: Marbac M., and Sedki S.
 }
 \references{
-Todo.
+Matthieu Marbac, Mohammed Sedki (2015). A Family of Blockwise One-Factor Distributions for Modelling High-Dimensional Binary Data. hal-01224333
 }
 \keyword{package}
 
