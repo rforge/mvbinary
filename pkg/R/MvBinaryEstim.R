@@ -28,6 +28,7 @@
 ##' @exportMethod print
 ##' @exportMethod summary
 ##' @exportClass MvBinaryResult
+##' @importFrom stats as.dist cutree hclust optimize runif
 ##'
 ##' @author
 ##' Author: Marbac M., and Sedki S.
@@ -42,7 +43,8 @@
 ##' # Data loading
 ##' data(MvBinaryExample)
 ##' 
-##' # Parameter estimation by the HAC-based algorithm on 2 cores where the EM algorithms are initialized 10 times
+##' # Parameter estimation by the HAC-based algorithm on 2 cores
+##' # where the EM algorithms are initialized 10 times
 ##' res.CAH <- MvBinaryEstim(MvBinaryExample, 2, nbinit.EM = 10)
 ##' 
 ##' # Summary of the estimated model
@@ -112,11 +114,13 @@ NULL
 ##' # Data loading
 ##' data(MvBinaryExample)
 ##' 
-##' # Parameter estimation by the HAC-based algorithm on 2 cores where the EM algorithms are initialized 10 times
+##' # Parameter estimation by the HAC-based algorithm on 2 cores
+##' # where the EM algorithms are initialized 10 times
 ##' res.CAH <- MvBinaryEstim(MvBinaryExample, 2, nbinit.EM = 10)
 ##' 
 ##' # Parameter estimation for two competing models
-##' res.CAH <- MvBinaryEstim(MvBinaryExample, algorithm="List", modelslist=list(c(1,1,2,2,3,4), c(1,1,1,2,2,2)), nbinit.EM = 10)
+##' res.CAH <- MvBinaryEstim(MvBinaryExample, algorithm="List",
+##'  modelslist=list(c(1,1,2,2,3,4), c(1,1,1,2,2,2)), nbinit.EM = 10)
 ##' 
 ##' # Summary of the estimated model
 ##' summary(res.CAH) 
