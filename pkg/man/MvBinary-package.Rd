@@ -26,7 +26,8 @@ require(MvBinary)
 # Data loading
 data(MvBinaryExample)
 
-# Parameter estimation by the HAC-based algorithm on 2 cores where the EM algorithms are initialized 10 times
+# Parameter estimation by the HAC-based algorithm on 2 cores
+# where the EM algorithms are initialized 10 times
 res.CAH <- MvBinaryEstim(MvBinaryExample, 2, nbinit.EM = 10)
 
 # Summary of the estimated model
