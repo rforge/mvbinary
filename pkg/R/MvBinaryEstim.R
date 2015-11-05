@@ -33,7 +33,7 @@
 ##' @author
 ##' Author: Marbac M., and Sedki S.
 ##'
-##' @references Matthieu Marbac, Mohammed Sedki (2015). A Family of Blockwise One-Factor Distributions for Modelling High-Dimensional Binary Data. hal-01224333
+##' @references Matthieu Marbac, Mohammed Sedki (2015). A Family of Blockwise One-Factor Distributions for Modelling High-Dimensional Binary Data. arXiv:1511.01343
 ##'
 ##' @examples
 ##' # Package loading
