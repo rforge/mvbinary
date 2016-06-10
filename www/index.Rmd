@@ -11,7 +11,7 @@ output: html_document
 * *Authors*: **Matthieu Marbac** and **Mohammed Sedki**.
 * *License*: [GPL-2](http://www.gnu.org/licenses/gpl-2.0.html).
 * *Download MvBinary 1.0*: [link](https://r-forge.r-project.org/R/?group_id=2011).  
-* *Reference*: [An Extended Family of One-Factor Distributions for Modelling High-Dimensional Binary Data](???), Marbac, M. and Sedki, M., 2015, preprint.
+* *Reference*: [An Extended Family of One-Factor Distributions for Modelling High-Dimensional Binary Data](http://arxiv.org/abs/1511.01343), Marbac, M. and Sedki, M., 2015, preprint.
 
 <a id="top"></a>
 **Site map:**  
