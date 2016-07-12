@@ -104,7 +104,7 @@ NULL
 ##' @param x matrix of the binary observation.
 ##' @param nbcores number of cores used for the model selection (only for Linux). Default is 1.
 ##' @param algorithm algorithm used for the model selection ("HAC": deterministic algorithm based on the HAC of the variables, "MH": stochastic algorithm for optimizing the BIC criterion, "List": comparison of the models provided by the users). Default is "HAC".
-##' @param modelslist list of models provided by the user (only used when algorithm="List"). Default is NULL
+##' @param models list of models provided by the user (only used when algorithm="List"). Default is NULL
 ##' @param tol.EM stopping criterion for the EM algorithm. Default is 0.01
 ##' @param nbinit.EM number of random initializations for the EM algorithm. Default is 40.
 ##' @param nbiter.MH number of successive iterations without finding a model having a better BIC criterion which involves the stopping of the Metropolis-Hastings algorithm (only used when algorithm="MH"). Default is 50.
@@ -120,7 +120,7 @@ NULL
 ##' 
 ##' # Parameter estimation for two competing models
 ##' res.CAH <- MvBinaryEstim(MvBinaryExample, algorithm="List",
-##'  modelslist=list(c(1,1,2,2,3,4), c(1,1,1,2,2,2)), nbinit.EM = 10)
+##'  models=list(c(1,1,2,2,3,4), c(1,1,1,2,2,2)), nbinit.EM = 10)
 ##' 
 ##' # Summary of the estimated model
 ##' summary(res.CAH) 
@@ -133,53 +133,32 @@ NULL
 ##'
 ##'
 MvBinaryEstim <- function(x, nbcores=1, algorithm="HAC", modelslist=NULL, tol.EM=0.01, nbinit.EM=40, nbiter.MH=50, nbchains.MH=10){
-  if ( (is.matrix(x)==FALSE) || any((x==0) + (x==1) == 0) )
-    stop("The input parameter x must be a binary matrix")
-  
-  if (is.null(colnames(x))) 
-    colnames(x) <- paste("x",1:ncol(x), sep="")  
-  
-  if ((is.numeric(nbcores)==FALSE) || (length(nbcores)!=1) || (nbcores!=ceiling(nbcores)) )
-    stop("The input parameter nbcores must be an integer")
-  
-  if (algorithm %in% c("HAC", "MH", "List") == FALSE)
-    stop("The input parameter algorithm must take one of these values HAC, MH, List")
-  
+  if ( (is.matrix(x)==FALSE) || any((x==0) + (x==1) == 0) )    stop("The input parameter x must be a binary matrix")
+  if (is.null(colnames(x)))     colnames(x) <- paste("x",1:ncol(x), sep="")  
+  if ((is.numeric(nbcores)==FALSE) || (length(nbcores)!=1) || (nbcores!=ceiling(nbcores)) ) stop("The input parameter nbcores must be an integer")
+  if (algorithm %in% c("HAC", "HAC2", "MH", "List") == FALSE)    stop("The input parameter algorithm must take one of these values HAC, MH, List")
   if (is.null(modelslist)==FALSE){
-    if (is.list(modelslist)){
-      for (j in 1:length(modelslist)){
-        if (length(modelslist[[j]])!=ncol(x))       stop("The input parameter modelslist must be a list where each element gives the partition of the variables by a vector of size d")
-      }
+    if (is.list(modelslist)){  lapply(1:length(modelslist), function(j) if (length(modelslist[[j]])!=ncol(x))  stop("The input parameter modelslist must be a list where each element gives the partition of the variables by a vector of size d"))
     }else{
       stop("The input parameter modelslist must be a list where each element gives the partition of the variables by a vector of size d")
     }
   }
-  
-  if ((is.numeric(tol.EM)==FALSE) || (length(tol.EM)!=1))
-    stop("The input parameter tol.EM must be a numeric value")
-  
-  if ((is.numeric(nbinit.EM)==FALSE) || (length(nbinit.EM)!=1) || (nbinit.EM!=ceiling(nbinit.EM)) )
-    stop("The input parameter nbinit.EM must be an integer")
-  
-  if (algorithm=="MH")
-    output <- MvBinaryEstimMH(x, nbcores, tol.EM, nbinit.EM, nbiter.MH, nbchains.MH)
-  else
-    output <- MvBinaryEstimCAH(x, nbcores, tol.EM, nbinit.EM, modelslist)
+  if ((is.numeric(tol.EM)==FALSE) || (length(tol.EM)!=1))    stop("The input parameter tol.EM must be a numeric value")
+  if ((is.numeric(nbinit.EM)==FALSE) || (length(nbinit.EM)!=1) || (nbinit.EM!=ceiling(nbinit.EM)) )    stop("The input parameter nbinit.EM must be an integer")
+  output <- NULL
+  if (algorithm=="MH")  output <- MvBinaryEstimMH(x, nbcores, tol.EM, nbinit.EM, nbiter.MH, nbchains.MH)
+  if (algorithm=="HAC")   output <- MvBinaryEstimCAH(x, nbcores, tol.EM, nbinit.EM, modelslist)
+  if (algorithm=="HAC2")   output <- MvBinaryEstimCAH2(x, nbcores, tol.EM, nbinit.EM, modelslist)
   return(output)
 }
 
-MvBinaryEstimCAH <- function(x, nbcores=1, tol=0.01, nbinit.EM=40, modelslist=NULL){
+MvBinaryEstimCAH <- function(x, nbcores=1, tol=0.01, nbinit.EM=40, models=NULL){
   alpha <- colMeans(x)
-  if (is.null(modelslist)){
-    # Computation of the Cramer's V 
-    VcramerEmpiric <- ComputeEmpiricCramer(x)
-    tree <- hclust(as.dist(1-VcramerEmpiric), method="ward")
-    models <- list(); for (k in 1:ncol(x)) models[[k]] <- cutree(tree, k)
-  }else{
-      models <- modelslist
+  if (is.null(models)){
+    tree <- hclust(as.dist(1-ComputeEmpiricCramer(x)), method="ward.D")
+    models <- lapply(1:ncol(x), function(k) cutree(tree, k))
   }
   # Inference for the competiting models
-  nb.cpus <- min(detectCores(all.tests = FALSE, logical = FALSE), nbcores)
   if ((nbcores>1)&&(Sys.info()["sysname"] != "Windows")){
     reference <- mclapply(X = models,
                           FUN = XEMmodel,
@@ -187,17 +166,14 @@ MvBinaryEstimCAH <- function(x, nbcores=1, tol=0.01, nbinit.EM=40, modelslist=NU
                           alpha=alpha,
                           tol=tol,
                           nbinit.EM=nbinit.EM,
-                          mc.cores = nb.cpus, mc.preschedule = TRUE, mc.cleanup = TRUE)
+                          mc.cores = min(detectCores(all.tests = FALSE, logical = FALSE), nbcores),
+                          mc.preschedule = TRUE, mc.cleanup = TRUE)
   }else{
-    reference <- list(); for (loc in 1:length(models)) reference[[loc]] <- XEMmodel(x, alpha, tol, nbinit.EM, models[[loc]])
+    reference <- lapply(1:length(models), function(loc) XEMmodel(x, alpha, tol, nbinit.EM, models[[loc]]))
   }
   # Design outputs
-  allBIC <- rep(NA, length(reference))
-  allModels <- matrix(NA, length(reference), ncol(x))
-  for (loc in 1:length(reference)){
-    allBIC[loc] <- reference[[loc]]$bic
-    allModels[loc,] <- models[[loc]]
-  }
+  allBIC <- unlist(lapply(1:length(reference), function(loc) reference[[loc]]$bic))
+  #  allModels <-  matrix(unlist(lapply(1:length(reference), function(loc) models[[loc]])), length(reference), ncol(x), byrow = TRUE)
   Best <- reference[[which.max(allBIC)]]
   names(reference[[which.max(allBIC)]]$epsilon) <-  names(reference[[which.max(allBIC)]]$delta) <- colnames(x)
   return( new("MvBinaryResult", 
@@ -208,6 +184,46 @@ MvBinaryEstimCAH <- function(x, nbcores=1, tol=0.01, nbinit.EM=40, modelslist=NU
               nbparam=reference[[which.max(allBIC)]]$nbparam,
               loglike=reference[[which.max(allBIC)]]$loglike,
               bic=reference[[which.max(allBIC)]]$bic)
+  )
+}
+
+
+is.inlistmodels <- function(cand, mod)  sum(unlist(lapply(1:length(mod), function(b) all(cand %in% mod[[b]]) * all(mod[[b]] %in% cand))))
+locations.inlistmodels <- function(cand, mod) which(unlist(lapply(1:length(mod), function(b) all(cand %in% mod[[b]]) * all(mod[[b]] %in% cand))) ==1)
+
+MvBinaryEstimCAH2 <- function(x, nbcores=1, tol=0.01, nbinit.EM=40, models=NULL){
+  alpha <- colMeans(x)
+  if (is.null(models)){
+    tree <- hclust(as.dist(1-ComputeEmpiricCramer(x)), method="ward.D")
+    models <- lapply(1:ncol(x), function(k) cutree(tree, k))
+  }
+  mod <- as.list(models[[length(models)]])
+  for (u in (length(mod)-1):1){
+    add <- unlist(lapply(1:max(models[[u]]), function(b) (is.inlistmodels(which(models[[u]]==b), mod)==0)))
+    mod <- c(list(which(models[[u]]==which(add==1))), mod)
+  }
+  essai <- list()
+  if (nbcores>1){
+    essai <- mclapply(1:length(mod), function(b) XEMblock2(x, alpha, tol, nbinit.EM, mod[[b]]),  mc.cores = min(detectCores(all.tests = FALSE, logical = FALSE), nbcores), mc.preschedule = TRUE, mc.cleanup = TRUE)
+  }else{
+    essai <- lapply(1:length(mod), function(b) XEMblock2(x, alpha, tol, nbinit.EM, mod[[b]]))    
+  }
+  best <- which.max(unlist(lapply(1:length(models), function(u) sum(unlist(lapply(1:max(models[[u]]), function(b) essai[[locations.inlistmodels(which(models[[u]]==b), mod)]]$bic))))))
+  blocks <- models[[best]]
+  bic <- sum(unlist(lapply(1:max(models[[best]]), function(b) essai[[locations.inlistmodels(which(models[[best]]==b), mod)]]$bic)))
+  loglike <- sum(unlist(lapply(1:max(models[[best]]), function(b) essai[[locations.inlistmodels(which(models[[best]]==b), mod)]]$loglike)))
+  nbparam <- sum(unlist(lapply(1:max(models[[best]]), function(b) essai[[locations.inlistmodels(which(models[[best]]==b), mod)]]$nbparam)))
+  epsilon <- delta <- rep(NA, ncol(x))
+  epsilon[order(blocks)] <- unlist(lapply(1:max(models[[best]]), function(b) essai[[locations.inlistmodels(which(models[[best]]==b), mod)]]$epsilon))
+  delta[order(blocks)] <- unlist(lapply(1:max(models[[best]]), function(b) essai[[locations.inlistmodels(which(models[[best]]==b), mod)]]$delta))
+  return( new("MvBinaryResult", 
+              alpha=alpha, 
+              epsilon=epsilon, 
+              delta=delta, 
+              blocks=blocks,
+              loglike=loglike,
+              nbparam=nbparam,
+              bic=bic)
   )
 }
 
