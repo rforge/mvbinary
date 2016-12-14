@@ -52,6 +52,7 @@ OneXemBlockfree <- function(x, weight, alpha, tol){
   loglikeprec <- -Inf
   loglikeactu <- sum(log(probaInd)*weight)
   compteur <- 0
+  if (is.na(loglikeactu)) loglikeactu <- loglikeprec <- 10**(-8)
   while ((loglikeactu - loglikeprec)>tol){
     compteur <- compteur + 1
     # E step
@@ -113,6 +114,7 @@ OneXemBlockEqual <- function(x, weight, alpha, tol){
   # Loglikelihood computation
   loglikeprec <- -Inf
   loglikeactu <- sum(log(probaInd)*weight)
+  if (is.na(loglikeactu)) loglikeactu <- loglikeprec <- 10**(-8)
   while ((loglikeactu - loglikeprec)>tol){
     # E step
     tij <- t(apply(sweep(sweep(fij,2,repere,"*"), 1, probaInd, "/"), 1, cumsum))
